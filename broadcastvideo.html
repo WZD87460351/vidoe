@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>broadcastvideo</title>
+	<style>
+		body{
+			margin: 0;
+		}
+		video{
+			display: none;
+			margin: 10px auto;
+			
+		}
+		#cen{
+			width: 300px;
+			margin: 0 auto;
+		}
+		#wrapper{
+			width: 1300px;
+			margin: 40px auto 0px;
+
+		}
+		ul li{
+			display: inline-block;
+			list-style: none;
+			width: 300px;
+		}
+		ul li img{
+			width: 100%;
+		}
+	</style>
+	<script src="ajax.js"></script>
+	<script>
+		window.onload = function(){
+			var oul = document.getElementById('ul');
+			var osong = document.getElementById('song');
+			var obtn = document.getElementById('btn');
+			
+			var video = document.getElementById('video');
+			obtn.onclick = function(){
+				if(osong.value == ''){
+					alert('fuck');
+					return false;
+				}
+				ajax({
+					type:'get',
+					url:'https://api.imjad.cn/cloudmusic/?type=search&s='+osong.value,
+					asy:true,
+					success:function(data){news(data)}
+				})
+			}
+			
+	
+			
+			oul.onclick = function(e){
+				var eve = e || window.event;
+				var target = eve.srcElement || eve.target;
+				if(target.getAttribute('data-id') == 0){
+					alert('we dont find the source');
+					return false;
+				}
+				if(target.nodeName.toLowerCase() == 'img'){
+					
+					ajax({
+						type:'get',
+						url:'https://api.imjad.cn/cloudmusic/?type=mv&id='+target.getAttribute('data-id')+'&br=128000',
+						
+						asy:true,
+						success:function(data){
+							if(data.data.brs.length != 0){
+								video.style.display = 'block';
+							}
+							video.setAttribute('src',data.data.brs['480']);
+							
+						}
+					})
+					
+				}
+			}
+		}
+			
+		function news(data){
+			var oul = document.getElementById('ul');
+			oul.innerHTML = '';
+			for(var i = 0;i < data.result.songs.length;i++){
+				var LI = document.createElement('li');
+				var oimg = document.createElement('img');
+				oimg.setAttribute('src',data.result.songs[i].al.picUrl);
+				oimg.setAttribute('data-id',data.result.songs[i].mv);
+				LI.appendChild(oimg);
+				oul.appendChild(LI);
+			}
+		}
+		
+	</script>
+</head>
+<body>
+	<div id="wrapper">
+		<div id="cen">
+			<input type="text" placeholder="请输入歌曲名称" id="song">
+			<button id="btn">提交</button>
+		</div>
+		
+		<video src="" id="video" controls autoplay></video>
+		
+		<ul id="ul">
+			
+			
+		</ul>
+		
+	</div>
+</body>
+</html>
